@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+{% block title %}Añadir suscripción | Subsy{% endblock %}
+
+{% block content %}
+<div class="form-card premium-form-card">
+  <h2>Añadir suscripción</h2>
+
+  <form method="POST" class="form-grid two-columns">
+    <div>
+      <label>Nombre</label>
+      <input type="text" name="name" placeholder="Netflix" required>
+    </div>
+
+    <div>
+      <label>Categoría</label>
+      <input type="text" name="category" placeholder="Streaming, Música, Cloud..." value="Streaming">
+    </div>
+
+    <div>
+      <label>Precio (€)</label>
+      <input type="number" name="price" step="0.01" placeholder="12.99" required>
+    </div>
+
+    <div>
+      <label>Ciclo de cobro</label>
+      <select name="billing_cycle" required>
+        <option value="monthly">Mensual</option>
+        <option value="yearly">Anual</option>
+      </select>
+    </div>
+
+    <div>
+      <label>Día de renovación</label>
+      <input type="number" name="renewal_day" min="1" max="31" placeholder="15" required>
+    </div>
+
+    <div>
+      <label>Fecha de inicio</label>
+      <input type="date" name="start_date">
+    </div>
+
+    <div>
+      <label>Color del servicio</label>
+      <input type="color" name="color" value="#38bdf8">
+    </div>
+
+    <div>
+      <label>Icono</label>
+      <select name="icon">
+        <option value="📺">📺 Streaming</option>
+        <option value="🎵">🎵 Música</option>
+        <option value="☁️">☁️ Cloud</option>
+        <option value="🎮">🎮 Gaming</option>
+        <option value="🎬">🎬 Cine</option>
+        <option value="📚">📚 Libros</option>
+        <option value="💼">💼 Productividad</option>
+        <option value="🛡️">🛡️ Seguridad</option>
+        <option value="💳">💳 Finanzas</option>
+        <option value="📦">📦 Otros</option>
+      </select>
+    </div>
+
+    <div class="full-width">
+      <label>Notas</label>
+      <textarea name="notes" rows="4" placeholder="Plan familiar, descuento, recordatorio..."></textarea>
+    </div>
+
+    <button type="submit" class="btn-primary full-width">Guardar suscripción</button>
+  </form>
+</div>
+{% endblock %}

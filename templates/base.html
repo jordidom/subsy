@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}Subsy{% endblock %}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+  <div class="bg-orb orb-1"></div>
+  <div class="bg-orb orb-2"></div>
+  <div class="bg-orb orb-3"></div>
+
+  <nav class="navbar">
+    <div class="container nav-content">
+      <a href="{{ url_for('index') }}" class="logo">Subsy</a>
+
+      <div class="nav-links">
+        {% if session.get('user_id') %}
+          <a href="{{ url_for('dashboard') }}">Dashboard</a>
+          <a href="{{ url_for('annual_view') }}">Vista anual</a>
+          <a href="{{ url_for('add_subscription') }}">Añadir</a>
+          <a href="{{ url_for('subscription_calendar') }}">Calendario</a>
+
+          <button class="theme-toggle" id="themeToggle" type="button">🌙</button>
+
+          <div class="notification-wrapper">
+            <button type="button" class="notification-bell" id="notificationBell">
+              🔔
+              {% if notification_count > 0 %}
+                <span>{{ notification_count }}</span>
+              {% endif %}
+            </button>
+
+            <div class="notification-dropdown" id="notificationDropdown">
+              <div class="notification-header">
+                <strong>Notificaciones</strong>
+                <small>{{ notification_count }} alerta(s)</small>
+              </div>
+
+              {% if notification_alerts %}
+                <div class="notification-list">
+                  {% for alert in notification_alerts %}
+                    <a href="{{ url_for('dashboard') }}#alertas" class="notification-item">
+                      <div class="notification-icon" style="background: {{ alert.color }}22; border-color: {{ alert.color }}55;">
+                        {{ alert.icon }}
+                      </div>
+
+                      <div>
+                        <strong>{{ alert.name }}</strong>
+
+                        {% if alert.days_left == 0 %}
+                          <p>Se renueva hoy. Precio: {{ alert.price }} €</p>
+                        {% elif alert.days_left == 1 %}
+                          <p>Se renueva mañana. Precio: {{ alert.price }} €</p>
+                        {% else %}
+                          <p>Faltan {{ alert.days_left }} días para renovarse. Precio: {{ alert.price }} €</p>
+                        {% endif %}
+                      </div>
+                    </a>
+                  {% endfor %}
+                </div>
+              {% else %}
+                <div class="notification-empty">
+                  No tienes renovaciones en los próximos 7 días.
+                </div>
+              {% endif %}
+            </div>
+          </div>
+
+          <a href="{{ url_for('logout') }}" class="btn-nav">Salir</a>
+        {% else %}
+          <button class="theme-toggle" id="themeToggle" type="button">🌙</button>
+          <a href="{{ url_for('login') }}">Login</a>
+          <a href="{{ url_for('register') }}" class="btn-nav">Registro</a>
+        {% endif %}
+      </div>
+    </div>
+  </nav>
+
+  <main class="container main-content">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <div class="flash-wrap">
+          {% for category, message in messages %}
+            <div class="flash flash-{{ category }}">{{ message }}</div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+
+    {% block content %}{% endblock %}
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>

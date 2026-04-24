@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+{% block title %}Registro | Subsy{% endblock %}
+
+{% block content %}
+<div class="auth-card">
+  <h2>Crear cuenta</h2>
+
+  <form method="POST" class="form-grid">
+    <div>
+      <label>Nombre de usuario</label>
+      <input type="text" name="username" required>
+    </div>
+
+    <div>
+      <label>Email</label>
+      <input type="email" name="email" required>
+    </div>
+
+    <div>
+      <label>Contraseña</label>
+      <input type="password" name="password" required>
+    </div>
+
+    <button type="submit" class="btn-primary full">Registrarme</button>
+  </form>
+</div>
+{% endblock %}

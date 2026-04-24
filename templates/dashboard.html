@@ -1,0 +1,185 @@
+{% extends 'base.html' %}
+{% block title %}Dashboard | Subsy{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1>Hola, {{ session.get('username') }}</h1>
+    <p>Controla tus plataformas, pagos recurrentes y renovaciones desde un panel visual.</p>
+  </div>
+
+  <div class="export-actions">
+    <a href="{{ url_for('annual_view') }}" class="btn-secondary">Vista anual</a>
+    <a href="{{ url_for('export_excel') }}" class="btn-secondary">Exportar Excel</a>
+    <a href="{{ url_for('export_pdf') }}" class="btn-primary">Exportar PDF</a>
+  </div>
+</div>
+
+<section class="stats-grid premium-stats">
+  <div class="stat-card glow-card">
+    <span class="stat-label">Total mensual estimado</span>
+    <h2>{{ monthly_total }} €</h2>
+    <p>Suma de activas mensuales + prorrateo de planes anuales.</p>
+  </div>
+
+  <div class="stat-card glow-card">
+    <span class="stat-label">Total anual estimado</span>
+    <h2>{{ annual_total }} €</h2>
+    <p>Estimación anual de tus servicios activos.</p>
+  </div>
+
+  <div class="stat-card glow-card">
+    <span class="stat-label">Activas / Inactivas</span>
+    <h2>{{ active_count }} / {{ inactive_count }}</h2>
+    <p>Servicios que pagas actualmente y servicios pausados.</p>
+  </div>
+</section>
+
+<section class="panel-grid dashboard-top">
+  <div class="panel-card premium-panel" id="alertas">
+    <div class="panel-title">
+      <h3>Alertas de renovación</h3>
+    </div>
+
+    {% if alerts %}
+      <div class="alerts-list">
+        {% for alert in alerts %}
+          <div class="alert-item premium-alert">
+            <div class="service-identity">
+              <div class="service-icon" style="background: {{ alert.color }}22; border-color: {{ alert.color }}55;">
+                <span>{{ alert.icon }}</span>
+              </div>
+
+              <div>
+                <strong>{{ alert.name }}</strong>
+                <p>Renueva el día {{ alert.renewal_day }}</p>
+              </div>
+            </div>
+
+            <div class="alert-meta">
+              <span>{{ alert.price }} €</span>
+
+              {% if alert.days_left == 0 %}
+                <small>Hoy</small>
+              {% elif alert.days_left == 1 %}
+                <small>Mañana</small>
+              {% else %}
+                <small>En {{ alert.days_left }} día(s)</small>
+              {% endif %}
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <p class="empty-text">No tienes alertas cercanas.</p>
+    {% endif %}
+  </div>
+
+  <div class="panel-card premium-panel">
+    <div class="panel-title">
+      <h3>Gráfico mensual</h3>
+    </div>
+
+    <div class="chart-wrap">
+      <canvas id="subscriptionsChart" data-chart='{{ chart_data|safe }}'></canvas>
+    </div>
+  </div>
+</section>
+
+<section class="panel-card premium-panel filters-panel">
+  <div class="panel-title">
+    <h3>Filtros</h3>
+  </div>
+
+  <form method="GET" action="{{ url_for('dashboard') }}" class="filters-form">
+    <div>
+      <label>Categoría</label>
+      <select name="category">
+        <option value="all" {% if current_category == 'all' %}selected{% endif %}>Todas</option>
+        {% for category in categories %}
+          <option value="{{ category }}" {% if current_category == category %}selected{% endif %}>
+            {{ category }}
+          </option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <div>
+      <label>Estado</label>
+      <select name="status">
+        <option value="all" {% if current_status == 'all' %}selected{% endif %}>Todas</option>
+        <option value="active" {% if current_status == 'active' %}selected{% endif %}>Activas</option>
+        <option value="inactive" {% if current_status == 'inactive' %}selected{% endif %}>Inactivas</option>
+      </select>
+    </div>
+
+    <button type="submit" class="btn-primary">Filtrar</button>
+  </form>
+</section>
+
+<section class="subscriptions-grid">
+  {% if subscriptions %}
+    {% for sub in subscriptions %}
+      <article class="subscription-card {% if not sub.is_active %}subscription-inactive{% endif %}">
+        <div class="subscription-top">
+          <div class="service-identity">
+            <div class="service-icon large-icon" style="background: {{ sub.color }}22; border-color: {{ sub.color }}66;">
+              <span>{{ sub.icon }}</span>
+            </div>
+
+            <div>
+              <h3>{{ sub.name }}</h3>
+              <p>{{ sub.category }}</p>
+            </div>
+          </div>
+
+          <span class="status-badge {% if sub.is_active %}status-active{% else %}status-inactive{% endif %}">
+            {% if sub.is_active %}Activa{% else %}Inactiva{% endif %}
+          </span>
+        </div>
+
+        <div class="subscription-price-row">
+          <div>
+            <span class="mini-label">Precio</span>
+            <strong>{{ sub.price }} €</strong>
+          </div>
+
+          <div>
+            <span class="mini-label">Ciclo</span>
+            <strong>{% if sub.billing_cycle == 'monthly' %}Mensual{% else %}Anual{% endif %}</strong>
+          </div>
+
+          <div>
+            <span class="mini-label">Cobro</span>
+            <strong>Día {{ sub.renewal_day }}</strong>
+          </div>
+        </div>
+
+        {% if sub.notes %}
+          <div class="subscription-notes">
+            {{ sub.notes }}
+          </div>
+        {% endif %}
+
+        <div class="subscription-actions">
+          <a href="{{ url_for('edit_subscription', sub_id=sub.id) }}" class="btn-secondary">Editar</a>
+
+          <form method="POST" action="{{ url_for('toggle_subscription', sub_id=sub.id) }}">
+            <button type="submit" class="btn-secondary">
+              {% if sub.is_active %}Desactivar{% else %}Activar{% endif %}
+            </button>
+          </form>
+
+          <form method="POST" action="{{ url_for('delete_subscription', sub_id=sub.id) }}" onsubmit="return confirm('¿Eliminar esta suscripción?');">
+            <button type="submit" class="btn-danger">Eliminar</button>
+          </form>
+        </div>
+      </article>
+    {% endfor %}
+  {% else %}
+    <div class="panel-card premium-panel">
+      <p class="empty-text">No hay suscripciones con esos filtros.</p>
+    </div>
+  {% endif %}
+</section>
+{% endblock %}

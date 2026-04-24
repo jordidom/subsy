@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+{% block title %}Editar suscripción | Subsy{% endblock %}
+
+{% block content %}
+<div class="form-card premium-form-card">
+  <h2>Editar suscripción</h2>
+
+  <form method="POST" class="form-grid two-columns">
+    <div>
+      <label>Nombre</label>
+      <input type="text" name="name" value="{{ subscription.name }}" required>
+    </div>
+
+    <div>
+      <label>Categoría</label>
+      <input type="text" name="category" value="{{ subscription.category }}" required>
+    </div>
+
+    <div>
+      <label>Precio (€)</label>
+      <input type="number" name="price" step="0.01" value="{{ subscription.price }}" required>
+    </div>
+
+    <div>
+      <label>Ciclo de cobro</label>
+      <select name="billing_cycle" required>
+        <option value="monthly" {% if subscription.billing_cycle == 'monthly' %}selected{% endif %}>Mensual</option>
+        <option value="yearly" {% if subscription.billing_cycle == 'yearly' %}selected{% endif %}>Anual</option>
+      </select>
+    </div>
+
+    <div>
+      <label>Día de renovación</label>
+      <input type="number" name="renewal_day" min="1" max="31" value="{{ subscription.renewal_day }}" required>
+    </div>
+
+    <div>
+      <label>Fecha de inicio</label>
+      <input type="date" name="start_date" value="{{ subscription.start_date.strftime('%Y-%m-%d') if subscription.start_date else '' }}">
+    </div>
+
+    <div>
+      <label>Color del servicio</label>
+      <input type="color" name="color" value="{{ subscription.color }}">
+    </div>
+
+    <div>
+      <label>Icono</label>
+      <select name="icon">
+        <option value="📺" {% if subscription.icon == '📺' %}selected{% endif %}>📺 Streaming</option>
+        <option value="🎵" {% if subscription.icon == '🎵' %}selected{% endif %}>🎵 Música</option>
+        <option value="☁️" {% if subscription.icon == '☁️' %}selected{% endif %}>☁️ Cloud</option>
+        <option value="🎮" {% if subscription.icon == '🎮' %}selected{% endif %}>🎮 Gaming</option>
+        <option value="🎬" {% if subscription.icon == '🎬' %}selected{% endif %}>🎬 Cine</option>
+        <option value="📚" {% if subscription.icon == '📚' %}selected{% endif %}>📚 Libros</option>
+        <option value="💼" {% if subscription.icon == '💼' %}selected{% endif %}>💼 Productividad</option>
+        <option value="🛡️" {% if subscription.icon == '🛡️' %}selected{% endif %}>🛡️ Seguridad</option>
+        <option value="💳" {% if subscription.icon == '💳' %}selected{% endif %}>💳 Finanzas</option>
+        <option value="📦" {% if subscription.icon == '📦' %}selected{% endif %}>📦 Otros</option>
+      </select>
+    </div>
+
+    <div class="full-width">
+      <label>Estado</label>
+      <select name="is_active">
+        <option value="1" {% if subscription.is_active %}selected{% endif %}>Activa</option>
+        <option value="0" {% if not subscription.is_active %}selected{% endif %}>Inactiva</option>
+      </select>
+    </div>
+
+    <div class="full-width">
+      <label>Notas</label>
+      <textarea name="notes" rows="4">{{ subscription.notes or '' }}</textarea>
+    </div>
+
+    <button type="submit" class="btn-primary full-width">Guardar cambios</button>
+  </form>
+</div>
+{% endblock %}

@@ -1,0 +1,85 @@
+{% extends 'base.html' %}
+{% block title %}Vista anual | Subsy{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1>Vista anual</h1>
+    <p>Resumen de lo que gastas al año en tus suscripciones activas.</p>
+  </div>
+
+  <div class="export-actions">
+    <a href="{{ url_for('export_excel') }}" class="btn-secondary">Exportar Excel</a>
+    <a href="{{ url_for('export_pdf') }}" class="btn-primary">Exportar PDF</a>
+  </div>
+</div>
+
+<section class="stats-grid premium-stats">
+  <div class="stat-card glow-card">
+    <span class="stat-label">Gasto mensual</span>
+    <h2>{{ monthly_total }} €</h2>
+    <p>Estimación actual mensual.</p>
+  </div>
+
+  <div class="stat-card glow-card">
+    <span class="stat-label">Gasto anual</span>
+    <h2>{{ annual_total }} €</h2>
+    <p>Estimación total de todo el año.</p>
+  </div>
+
+  <div class="stat-card glow-card">
+    <span class="stat-label">Media por trimestre</span>
+    <h2>{{ (annual_total / 4)|round(2) }} €</h2>
+    <p>Estimación por cada trimestre.</p>
+  </div>
+</section>
+
+<section class="panel-card premium-panel">
+  <div class="panel-title">
+    <h3>Gasto estimado por mes</h3>
+  </div>
+
+  <div class="annual-bars">
+    {% for item in annual_months %}
+      <div class="annual-row">
+        <span>{{ item.month }}</span>
+        <div class="annual-bar-wrap">
+          <div class="annual-bar" style="width: {{ (item.total / monthly_total * 100) if monthly_total > 0 else 0 }}%;"></div>
+        </div>
+        <strong>{{ item.total }} €</strong>
+      </div>
+    {% endfor %}
+  </div>
+</section>
+
+<section class="panel-card premium-panel">
+  <div class="panel-title">
+    <h3>Resumen por categoría</h3>
+  </div>
+
+  {% if category_summary %}
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Categoría</th>
+            <th>Gasto mensual</th>
+            <th>Gasto anual</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for item in category_summary %}
+            <tr>
+              <td>{{ item.category }}</td>
+              <td>{{ item.monthly }} €</td>
+              <td>{{ item.annual }} €</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    <p class="empty-text">No tienes suscripciones activas.</p>
+  {% endif %}
+</section>
+{% endblock %}

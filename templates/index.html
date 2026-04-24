@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+{% block title %}Inicio | Subsy{% endblock %}
+
+{% block content %}
+<section class="hero">
+  <div class="hero-card">
+    <span class="badge">Gestor de suscripciones</span>
+    <h1>Controla todos tus pagos recurrentes en un solo sitio</h1>
+    <p>
+      Añade Netflix, Spotify, Disney+, almacenamiento en la nube, apps premium
+      y cualquier servicio que pagues cada mes o cada año.
+    </p>
+    <div class="hero-actions">
+      <a href="{{ url_for('register') }}" class="btn-primary">Crear cuenta</a>
+      <a href="{{ url_for('login') }}" class="btn-secondary">Iniciar sesión</a>
+    </div>
+  </div>
+</section>
+{% endblock %}
